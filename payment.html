@@ -168,17 +168,14 @@ import {
     getDoc
 } from "./firebase.js";
 
-const policyNumber =
-sessionStorage.getItem("policyNumber");
+const token = new URLSearchParams(window.location.search).get("id");
 
-if(!policyNumber){
+if (!token) {
+    alert("Invalid payment link");
     window.location.href = "index.html";
 }
-
 try{
-
-    const docRef =
-    doc(db,"policies",policyNumber);
+const docRef = doc(db, "payments", token);
 
     const docSnap =
     await getDoc(docRef);
@@ -213,7 +210,6 @@ try{
     document.getElementById("loading").style.display="none";
     document.getElementById("detailsBox").style.display="block";
     document.getElementById("qrCode").style.display="inline-block";
-
 }
 catch(error){
 
