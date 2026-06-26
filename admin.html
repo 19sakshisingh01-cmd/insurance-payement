@@ -137,20 +137,20 @@ btn.innerText = "Generating...";
 
     try{
 
-        await setDoc(
-            doc(db,"policies",policy),
-            {
-                policy,
-                customer,
-                amount,
-                upi
-            }
-        );
+      const token = crypto.randomUUID().replace(/-/g, "").substring(0, 10);
 
-       const link = window.location.href.replace(
-    "admin.html",
-    "index.html?policy=" + policy
+await setDoc(
+    doc(db, "payments", token),
+    {
+        policy,
+        customer,
+        amount,
+        upi
+    }
 );
+
+const link = window.location.origin + "/payment.html?id=" + token;  
+
         document.getElementById(
         "generatedLink"
         ).value = link;
