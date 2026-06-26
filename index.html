@@ -159,56 +159,63 @@ Please note: Axis Max Life shall not be liable to pay any interest on the said a
 
 <script type="module">
 
+<script type="module">
+
 import {
     db,
-    doc,
-    getDoc
+    collection,
+    query,
+    where,
+    getDocs
 } from "./firebase.js";
 
-window.proceed = async function(){
+window.proceed = async function () {
 
     const policy =
     document.getElementById("policyNumber").value.trim();
 
-    if(!/^\d{9}$/.test(policy)){
+    if (!/^\d{9}$/.test(policy)) {
         alert("Please enter a valid 9 digit policy number");
         return;
     }
-const btn = document.querySelector(".proceed-btn");
 
-btn.disabled = true;
-btn.innerText = "Please Wait...";
-    try{
+    const btn = document.querySelector(".proceed-btn");
 
-        const docRef =
-        doc(db, "policies", policy);
+    btn.disabled = true;
+    btn.innerText = "Please Wait...";
 
-        const docSnap =
-        await getDoc(docRef);
+    try {
 
-        if(!docSnap.exists()){
+        const q = query(
+            collection(db, "payments"),
+            where("policy", "==", policy)
+        );
+
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+
+            btn.disabled = false;
+            btn.innerText = "Proceed";
 
             alert("Invalid Policy Number");
             return;
-
         }
 
-        sessionStorage.setItem(
-            "policyNumber",
-            policy
-        );
-btn.disabled = false;
-btn.innerText = "Proceed";
+        const token = snapshot.docs[0].id;
 
-        window.location.href ="payment.html";
-
+        window.location.href =
+        "payment.html?id=" + token;
 
     }
-    catch(error){
-btn.disabled = false;
-btn.innerText = "Proceed";
+
+    catch (error) {
 
         console.error(error);
+
+        btn.disabled = false;
+        btn.innerText = "Proceed";
+
         alert("Unable to verify policy");
 
     }
